@@ -2,6 +2,8 @@ package grex.control;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static grex.Expector.expect;
 import static grex.Expector.fail;
 import static grex.Expector.noop;
@@ -55,6 +57,12 @@ public class OptionTests {
     expect(some).not().toBeNull();
     expect(some.isEmpty()).toBeFalse();
     expect(some.isDefined()).toBeTrue();
+  }
+
+  @Test
+  void ofOptional() {
+    var option = Option.ofOptional(Optional.of(5));
+    expect(option).not().toBeNull();
   }
 
   @Test

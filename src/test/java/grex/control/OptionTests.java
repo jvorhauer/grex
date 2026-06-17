@@ -15,7 +15,7 @@ public class OptionTests {
   void some() {
     Option.Some<Integer> some = Option.some(1);
     expect(some).not().toBeNull();
-    expect(some.isEmpty()).toBeFalse();
+    expect(some.isEmpty()).not().toBeTrue();
     expect(some.get()).toBe(1);
   }
 
@@ -55,7 +55,7 @@ public class OptionTests {
   void isEmptyAndIsDefined() {
     Option.Some<Integer> some = Option.some(1);
     expect(some).not().toBeNull();
-    expect(some.isEmpty()).toBeFalse();
+    expect(some.isEmpty()).not().toBeTrue();
     expect(some.isDefined()).toBeTrue();
   }
 
@@ -71,7 +71,7 @@ public class OptionTests {
     expect(some).not().toBeNull();
     some.fold(
       val -> expect(val).toBe(1),
-      () -> fail("not the expected value")
+      () -> fail("expected Some value, ")
     );
 
     Option.None<Integer> none = Option.none();

@@ -2,20 +2,37 @@ package grex;
 
 import java.util.function.Predicate;
 
-@SuppressWarnings("UnusedReturnValue")
 public final class IntegerExpector extends Expector<Integer, IntegerExpector> {
 
-  private final Predicate<Integer> isPositive = n -> n > 0;
+  private static final Predicate<Integer> pZero = i -> i == null || i != 0;
+  private static final Predicate<Integer> pPos = i -> i == null || i <= 0;
+  private static final Predicate<Integer> pNeg = i -> i == null || i >= 0;
+
+  private final Predicate<Integer> pEq = i -> i == null || i.compareTo(actual) != 0;
+
 
   public IntegerExpector(final Integer integer) {
     super(integer);
   }
 
-  public grex.IntegerExpector toBePositive() {
-    return isPositive.test(actual) ? this : disappointment(actual + " to be positive", stringify(actual));
+  public IntegerExpector toBePositive() {
+    if ((inverted ? pNeg : pPos).test(actual)) {
+      disappoint(inverted ? "negative" : "positive");
+    }
+    return self();
   }
 
-  public grex.IntegerExpector toBe(final Integer i) {
-    return isNotNull && actual.compareTo(i) == 0 ? this : disappointment(actual + " to be " + i, stringify(actual));
+  public IntegerExpector toBeZero() {
+    if ((inverted ? pZero.negate() : pZero).test(actual)) {
+      disappoint(inverted ? "not 0" : "0");
+    }
+    return self();
+  }
+
+  public IntegerExpector toBe(final int i) {
+    if ((inverted ? pEq.negate() : pEq).test(i)) {
+      disappoint(inverted ? "not " + i : stringify(i));
+    }
+    return self();
   }
 }

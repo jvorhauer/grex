@@ -4,14 +4,14 @@ import grex.control.Either;
 import grex.control.Option;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
-@SuppressWarnings("UnusedReturnValue")
-public abstract sealed class Expector<T, S extends Expector<T, S>> permits BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, ObjectExpector, IntegerExpector, LongExpector, OptionExpector {
+public abstract sealed class Expector<T, S extends Expector<T, S>> permits BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
   protected final Class<T> clazz;
   protected final String className;
   protected final T actual;
-  protected final boolean isNull;
-  protected final boolean isNotNull;
+  protected boolean isNull;
+  protected boolean isNotNull;
   protected boolean inverted = false;   // applied .not()
 
   @SuppressWarnings("unchecked")
@@ -26,13 +26,13 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
 
   @SuppressWarnings("unchecked")
   protected final S self() {
-    inverted = false;
+    inverted = false;  // always reset after .not() and immediate .toBe...()
     return (S) this;
   }
 
   @SuppressWarnings("unchecked")
   public S not() {
-    inverted = true;
+    inverted = !inverted;    // next toBe...() will be inverted (negated), unless inverted was already set
     return (S) this;
   }
 
@@ -65,12 +65,12 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
     }).getOrElse("NULL");
   }
 
-  protected S disappointment(final String expected) {
-    return disappointment(stringify(expected), stringify(this.actual));
+  protected S disappoint(final String expected) {
+    return disappoint(expected, stringify(this.actual));
   }
 
-  protected S disappointment(final String expected, final String other) {
-    throw new Disappointment(expected, other);
+  protected S disappoint(final String expected, final String actual) {
+    throw new Disappointment(expected, actual);
   }
 
   public static void fail(final String msg) {
@@ -115,5 +115,9 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
 
   public static OptionExpector expect(final Option<?> o) {
     return new OptionExpector(o);
+  }
+
+  public static SupplierExpector expect(final Supplier<?> s) {
+    return new SupplierExpector(s);
   }
 }

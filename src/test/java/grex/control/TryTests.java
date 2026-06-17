@@ -12,7 +12,7 @@ class TryTests {
     expect(ts).not().toBeNull();
     expect(ts.get()).toBe("Hello");
     expect(ts.isSuccess()).toBeTrue();
-    expect(ts.isFailure()).toBeFalse();
+    expect(ts.isFailure()).not().toBeTrue();
   }
 
   @Test
@@ -20,7 +20,7 @@ class TryTests {
     Try<String> ts = Try.of(() -> thrower("You can't just do that!"));
     expect(ts).not().toBeNull();
     expect(ts).toBeOf(Try.Failure.class);
-    expect(ts.isSuccess()).toBeFalse();
+    expect(ts.isSuccess()).not().toBeTrue();
     expect(ts.isFailure()).toBeTrue();
     expect(ts.getCause()).toBeOf(IllegalArgumentException.class);
   }
@@ -30,22 +30,22 @@ class TryTests {
   void equals() {
     Try<String> t1 = Try.of(() -> "Hello");
     expect(t1.equals(t1)).toBeTrue();
-    expect(t1.equals("Hello")).toBeFalse();
+    expect(t1.equals("Hello")).not().toBeTrue();
 
     Try<String> t2 = Try.of(() -> "Hello");
     expect(t1.equals(t2)).toBeTrue();
 
     t2 = Try.of(() -> "World");
-    expect(t1.equals(t2)).toBeFalse();
+    expect(t1.equals(t2)).not().toBeTrue();
 
     t1 = Try.of(() -> thrower("T1"));
-    expect(t1.equals(t2)).toBeFalse();
+    expect(t1.equals(t2)).not().toBeTrue();
 
     t2 = Try.of(() -> thrower("T1"));
-    expect(t1.equals(t2)).toBeFalse();    // throwers are called on different lines, the stack trace contains linenumbers!
+    expect(t1.equals(t2)).not().toBeTrue();    // throwers are called on different lines, the stack trace contains linenumbers!
 
     t2 = Try.of(() -> thrower("T2"));
-    expect(t1.equals(t2)).toBeFalse();
+    expect(t1.equals(t2)).not().toBeTrue();
   }
 
   @Test

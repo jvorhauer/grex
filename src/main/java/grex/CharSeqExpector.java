@@ -5,10 +5,10 @@ public sealed class CharSeqExpector<T extends CharSequence, S extends CharSeqExp
 
   public CharSeqExpector(final T t) {
     super(t);
-    this.isEmpty = t == null || t.isEmpty();
+    this.isEmpty = isNull || t.isEmpty();
   }
 
   public grex.CharSeqExpector<?, ?> toBeEmpty() {
-    return inverted == isEmpty ? disappointment("empty", stringify(actual)) : this;
+    return inverted == isEmpty ? disappoint("empty", stringify(actual)) : this;
   }
 }

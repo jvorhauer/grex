@@ -1,20 +1,20 @@
 package grex;
 
+import java.util.function.Predicate;
+
 @SuppressWarnings("UnusedReturnValue")
 public final class BooleanExpector extends Expector<Boolean, BooleanExpector> {
 
-  private final boolean isTrue;
+  private final Predicate<Boolean> pTrue = b -> b == null || !b;
 
   public BooleanExpector(final Boolean b) {
     super(b);
-    this.isTrue = isNotNull && b;
   }
 
   public BooleanExpector toBeTrue() {
-    return isTrue ? this : disappointment("true");
-  }
-
-  public BooleanExpector toBeFalse() {
-    return !isTrue ? this : disappointment("true");
+    if ((inverted ? pTrue.negate() : pTrue).test(actual)) {
+      disappoint(Boolean.toString(!inverted));
+    }
+    return self();
   }
 }

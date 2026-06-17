@@ -8,25 +8,22 @@ public final class OptionExpector extends Expector<Option<?>, OptionExpector> {
   }
 
   public OptionExpector toBeEmpty() {
-    if (!inverted && actual.isDefined()) {
-      disappointment("empty", "defined (" + actual.get() + ")");
-    }
     if (inverted && actual.isEmpty()) {
-      disappointment("not empty", "empty");
+      disappoint("not empty", "empty");
     }
-    inverted = false;
+    if (!inverted && actual.isDefined()) {
+      disappoint("empty", "defined (" + actual.get() + ")");
+    }
     return self();
   }
 
   public OptionExpector toBeDefined() {
     if (!inverted && actual.isEmpty()) {
-      disappointment("defined", "empty");
+      disappoint("defined", "empty");
     }
     if (inverted && actual.isDefined()) {
-      disappointment("empty", "defined (" + actual.get() + ")");
+      disappoint("empty", "defined (" + actual.get() + ")");
     }
-    inverted = false;
     return self();
-
   }
 }

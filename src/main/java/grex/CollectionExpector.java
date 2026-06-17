@@ -13,11 +13,11 @@ public final class CollectionExpector extends Expector<Collection<?>, Collection
     isEmpty = size == 0;
   }
 
-  public grex.CollectionExpector toHaveSize(final int expected) {
-    return (inverted == (this.size != expected)) ? this : disappointment(className + " with size " + expected, className + " with size " + expected);
+  public CollectionExpector toHaveSize(final int expected) {
+    return (inverted == (this.size != expected)) ? self() : disappoint(className + " with size " + expected, className + " with size " + expected);
   }
 
-  public grex.CollectionExpector toBeEmpty() {
-    return (inverted != isEmpty) ? this : disappointment(className + " to be empty", actual + ", size: " + size);
+  public CollectionExpector toBeEmpty() {
+    return (inverted != isEmpty) ? self() : disappoint(className + " to be empty", actual + ", size: " + size);
   }
 }

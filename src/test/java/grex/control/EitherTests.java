@@ -14,14 +14,14 @@ final class EitherTests {
     Either<String, String> left = Either.left("Hello");
     expect(left).not().toBeNull().and().toBeLeft();
     expect(left.isLeft()).toBeTrue();
-    expect(left.isRight()).toBeFalse();
+    expect(left.isRight()).not().toBeTrue();
     expect(left.getLeft()).not().toBeNull().not().toBeBlank().toBe("Hello");
     expect(left.getOrElse("World")).not().toBeNull().not().toBeBlank().toBe("World");
 
     left = new Left<>("World");
     expect(left).not().toBeNull().and().toBeLeft();
     expect(left.isLeft()).toBeTrue();
-    expect(left.isRight()).toBeFalse();
+    expect(left.isRight()).not().toBeTrue();
     expect(left.getLeft()).not().toBeNull().not().toBeBlank().toBe("World");
     expect(left.getOrElse("Hello")).not().toBeNull().not().toBeBlank().toBe("Hello");
 
@@ -35,14 +35,14 @@ final class EitherTests {
   void right() {
     Either<String, String> right = Either.right("Hello");
     expect(right).not().toBeNull().toBeRight();
-    expect(right.isLeft()).toBeFalse();
+    expect(right.isLeft()).not().toBeTrue();
     expect(right.isRight()).toBeTrue();
     expect(right.getRight()).not().toBeNull().not().toBeBlank().toBe("Hello");
     expect(right.getOrElse("World")).not().toBeNull().not().toBeBlank().toBe("Hello");
 
     right = new Right<>("World");
     expect(right).not().toBeNull().toBeRight();
-    expect(right.isLeft()).toBeFalse();
+    expect(right.isLeft()).not().toBeTrue();
     expect(right.isRight()).toBeTrue();
     expect(right.getRight()).not().toBeNull().not().toBeBlank().toBe("World");
     expect(right.get()).toBe(right.getRight());
@@ -51,7 +51,7 @@ final class EitherTests {
     right.ifLeft(value -> fail("Right should not be left (" + value + ")" ));
     right.ifRight(value -> expect(value).toBe("World"));
 
-    expect(right.toOption().isEmpty()).toBeFalse();
+    expect(right.toOption().isEmpty()).not().toBeTrue();
   }
 
   @Test

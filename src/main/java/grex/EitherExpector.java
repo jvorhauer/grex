@@ -4,15 +4,38 @@ import grex.control.Either;
 
 public final class EitherExpector extends Expector<Either<?, ?>, EitherExpector> {
 
+  private final boolean isLeft;
+  private final boolean isRight;
+
   public EitherExpector(final Either<?, ?> either) {
     super(either);
+    isLeft = isNotNull && either.isLeft();
+    isRight = isNotNull && either.isRight();
   }
 
   public grex.EitherExpector toBeLeft() {
-    return isNotNull && actual.isLeft() ? this : disappointment("Expected Left");
+    if (inverted) {
+      if (isLeft) {
+        disappoint("Left", "Right (" + actual.get() + ")");
+      }
+    } else {
+      if (isRight) {
+        disappoint("Right", "Left");
+      }
+    }
+    return self();
   }
 
   public grex.EitherExpector toBeRight() {
-    return isNotNull && actual.isRight() ? this : disappointment("Expected Right");
+    if (inverted) {
+      if (isRight) {
+        disappoint("Left", "Right (" + actual.get() + ")");
+      }
+    } else {
+      if (isLeft) {
+        disappoint("Right", "Left");
+      }
+    }
+    return self();
   }
 }

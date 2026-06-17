@@ -20,11 +20,11 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
     return (Either<L, R>) either;
   }
 
-  static <L, R> Either<L, R> attempt(final Supplier<? extends R> supplier, Function<Throwable, ? extends L> errorer) {
+  static <L, R> Either<L, R> attempt(final Supplier<? extends R> supplier, Function<Throwable, ? extends L> errfn) {
     try {
       return Either.right(supplier.get());
     } catch (final Throwable t) {
-      return Either.left(errorer.apply(t));
+      return Either.left(errfn.apply(t));
     }
   }
 

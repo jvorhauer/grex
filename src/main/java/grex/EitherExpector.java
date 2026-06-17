@@ -9,8 +9,8 @@ public final class EitherExpector extends Expector<Either<?, ?>, EitherExpector>
 
   public EitherExpector(final Either<?, ?> either) {
     super(either);
-    isLeft = isNotNull && either.isLeft();
-    isRight = isNotNull && either.isRight();
+    isLeft = either != null && either.isLeft();
+    isRight = either != null && either.isRight();
   }
 
   public grex.EitherExpector toBeLeft() {

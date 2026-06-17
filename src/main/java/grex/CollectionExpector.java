@@ -14,10 +14,12 @@ public final class CollectionExpector extends Expector<Collection<?>, Collection
   }
 
   public CollectionExpector toHaveSize(final int expected) {
-    return (inverted == (this.size != expected)) ? self() : disappoint(className + " with size " + expected, className + " with size " + expected);
+    return (inverted == (size == expected)) ?
+      disappoint(className + " to " + (inverted ? "not " : "") + " have size " + expected, className + " with size " + expected) :
+      self();
   }
 
   public CollectionExpector toBeEmpty() {
-    return (inverted != isEmpty) ? self() : disappoint(className + " to be empty", actual + ", size: " + size);
+    return (inverted == isEmpty) ? disappoint(className + " to be empty", actual + ", size: " + size) : self();
   }
 }

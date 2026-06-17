@@ -38,6 +38,6 @@ class LongExpectorTests {
   void attempts() {
     Either<String, LongExpector> att = Either.attempt(() -> expect(1L).toBeZero(), e -> "Failed: " + e.getMessage());
     expect(att).toBeLeft();
-    expect(att.getLeft()).toContain("Failed: Expected 1L");
+    expect(att.getLeft()).toContain("Expected: zero");
   }
 }

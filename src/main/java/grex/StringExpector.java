@@ -9,11 +9,12 @@ public final class StringExpector extends CharSeqExpector<String, StringExpector
   private int size;
   private final boolean isBlank;
 
-  private final Predicate<String> contains = str -> isNotNull && actual.contains(str);
-  private final Predicate<String> containsIgnoringCase = str -> isNotNull && actual.toLowerCase().contains(str.toLowerCase());
-  private final Predicate<Integer> longerThen = i -> this.size > i;
-  private final Predicate<Integer> longerOrEqualInLength = i -> this.size >= i;
-  private final Predicate<Integer> hasLength = i -> this.size == i;
+  private final Predicate<String> pCont = s -> s == null || !actual.contains(s);
+  private final Predicate<String> pContNoCase = s -> s == null || !actual.toLowerCase().contains(s.toLowerCase());
+  private final Predicate<Integer> pLonger = i -> i == null || size <= i;
+  private final Predicate<Integer> pLongerOrEqualLength = i -> i == null || size < i;
+  private final Predicate<Integer> pLen = i -> i == null || size != i;
+  private final Predicate<String> pEq = s -> s == null || s.compareTo(actual) != 0;
 
   public StringExpector(final String s) {
     super(s);
@@ -23,35 +24,35 @@ public final class StringExpector extends CharSeqExpector<String, StringExpector
   }
 
   @Override
-  public grex.StringExpector toBeEmpty() {
-    return inverted == isEmpty ? disappoint("empty", actual) : this;
+  public StringExpector toBeEmpty() {
+    return inverted == isEmpty ? disappoint(inverted ? "not empty" : "empty") : this;
   }
 
-  public grex.StringExpector toBeBlank() {
-    return inverted == isBlank ? disappoint("blank", actual) : this;
+  public StringExpector toBeBlank() {
+    return inverted == isBlank ? disappoint(inverted ? "not blank" : "blank") : self();
   }
 
-  public grex.StringExpector toHaveLength(final int length) {
-    return hasLength.test(length) ? this : disappoint("string with length " + length, stringify(size));
+  public StringExpector toHaveLength(final int length) {
+    return pLen.test(length) ? disappoint("string with length " + length, stringify(size)) : self();
   }
 
-  public grex.StringExpector toHaveLengthGreaterThan(final int length) {
-    return longerThen.test(length) ? this : disappoint("string with length greater than " + length, stringify(size));
+  public StringExpector toHaveLengthGreaterThan(final int length) {
+    return pLonger.test(length) ? disappoint("string with length greater than " + length, stringify(size)) : self();
   }
 
-  public grex.StringExpector toHaveLengthGreaterThanOrEqualTo(final int length) {
-    return longerOrEqualInLength.test(length) ? this : disappoint("string with length of " + length + " or greater", stringify(size));
+  public StringExpector toHaveLengthGreaterThanOrEqualTo(final int length) {
+    return pLongerOrEqualLength.test(length) ? disappoint("string with length of " + length + " or greater", stringify(size)) : self();
   }
 
-  public grex.StringExpector toContain(final String sub) {
-    return !contains.test(sub) ? disappoint("string that contains " + sub, sub + " not in " + actual) : this;
+  public StringExpector toContain(final String sub) {
+    return pCont.test(sub) ? disappoint("string that contains " + sub, sub + " not in " + actual) : self();
   }
 
-  public grex.StringExpector toContainIgnoreCase(final String sub) {
-    return !containsIgnoringCase.test(sub) ? disappoint("string that contains " + sub + " ignoring case", sub + " not in " + actual) : this;
+  public StringExpector toContainIgnoreCase(final String sub) {
+    return invert(pContNoCase).test(sub) ? disappoint("string that contains " + sub + " ignoring case", sub + " not in " + actual) : self();
   }
 
-  public grex.StringExpector toBe(final String sub) {
-    return isNotNull && actual.contentEquals(sub) ? this : disappoint(actual + " to equal " + sub, actual + " is not equal to " + sub);
+  public StringExpector toBe(final String s) {
+    return invert(pEq).test(s) ? disappoint((inverted ? "not " : "") + s) : self();
   }
 }

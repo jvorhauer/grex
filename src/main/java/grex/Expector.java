@@ -4,24 +4,27 @@ import grex.control.Either;
 import grex.control.Option;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public abstract sealed class Expector<T, S extends Expector<T, S>> permits BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
-  protected final Class<T> clazz;
-  protected final String className;
-  protected final T actual;
+  private Class<T> clazz;
+  protected String className;
+  protected T actual;
   protected boolean isNull;
-  protected boolean isNotNull;
   protected boolean inverted = false;   // applied .not()
+  private String description;
+
+  private final Predicate<Class<?>> pEqCls = c -> !this.clazz.equals(c);
 
   @SuppressWarnings("unchecked")
   public Expector(final T t) {
     final Option<T> ot = Option.of(t);
     this.isNull = ot.isEmpty();
-    this.isNotNull = !isNull;
     this.clazz = (Class<T>) ot.map(u -> u.getClass()).getOrElse(null);
-    this.className = ot.map(u -> u.getClass().getCanonicalName()).getOrElse(null);
+    this.className = ot.map(u -> u.getClass().getCanonicalName()).getOrElse("NULL");
     this.actual = t;
+    this.description = className;
   }
 
   @SuppressWarnings("unchecked")
@@ -40,22 +43,19 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
     return self();
   }
 
-  public final S toBeNull() {
-    if (inverted ? isNull : isNotNull) {
-      throw new Disappointment("null", stringify(actual));
-    }
+  public S as(final String description) {
+    this.description = description;
     return self();
   }
 
-  public final S toBeOf(final Class<?> clazz) {
-    if (!inverted && !this.clazz.equals(clazz)) {
-      throw new Disappointment(clazz.getCanonicalName(), className);
-    }
-    if ((inverted && this.clazz.equals(clazz))) {
-      throw new Disappointment("not " + clazz.getCanonicalName(), className);
-    }
-    return self();
+  public final S toBeNull() {
+    return (inverted == isNull) ? disappoint((inverted ? "not ": "") + "null") : self();
   }
+
+  public final S toBeOf(final Class<?> clazz) {
+    return (inverted ? pEqCls.negate() : pEqCls).test(clazz) ? disappoint(clazz.getCanonicalName(), this.className) : self();
+  }
+
 
   protected final String stringify(final Object value) {
     return Option.of(value).map(o -> switch (o) {
@@ -65,12 +65,17 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
     }).getOrElse("NULL");
   }
 
-  protected S disappoint(final String expected) {
-    return disappoint(expected, stringify(this.actual));
+  protected final S disappoint(final String expected) {
+    return disappoint(expected, stringify(actual));
   }
 
-  protected S disappoint(final String expected, final String actual) {
-    throw new Disappointment(expected, actual);
+  protected final S disappoint(final String expected, final String actual) {
+    System.out.printf("disappoint: description: %s, expected: %s, actual: %s%n", description, expected, actual);
+    throw new Disappointment(description, expected, actual);
+  }
+
+  protected final Predicate<T> invert(final Predicate<T> pt) {
+    return inverted ? pt.negate() : pt;
   }
 
   public static void fail(final String msg) {
@@ -80,6 +85,7 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
   public static void noop() {
     // do nothing
   }
+
 
   public static IntegerExpector expect(final Integer value) {
     return new IntegerExpector(value);

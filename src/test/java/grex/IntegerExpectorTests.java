@@ -17,6 +17,7 @@ final class IntegerExpectorTests {
     expect(-42).not().toBeNull()
       .not().toBePositive()
       .not().toBeZero()
+      .toBeOf(Integer.class)
       .toBe(-42);
   }
 
@@ -55,8 +56,9 @@ final class IntegerExpectorTests {
   void nullToBeNotVeryInteresting() {
     Integer n = null;
     expect(n).toBeNull();
-    expect(() -> expect(n).toBeZero()).toDisappoint()
+    expect(() -> expect(n).as("FAIL").toBeZero()).toDisappoint()
       .toContain("Expected: 0")
+      .toContain("FAIL")
       .toContain("NULL");
   }
 

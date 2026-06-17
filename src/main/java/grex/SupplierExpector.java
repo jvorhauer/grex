@@ -14,7 +14,6 @@ public final class SupplierExpector extends Expector<Supplier<?>, SupplierExpect
       this.t = t;
     }
     isNull = t == null;
-    isNotNull = !isNull;
   }
 
   public SupplierExpector not() {

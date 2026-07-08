@@ -3,11 +3,12 @@ package grex;
 import grex.control.Either;
 import grex.control.Option;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public abstract sealed class Expector<T, S extends Expector<T, S>> permits BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
+public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDecimalExpector, BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
   private Class<T> clazz;
   protected String className;
   protected T actual;
@@ -112,6 +113,10 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
 
   public static LongExpector expect(final Long l) {
     return new LongExpector(l);
+  }
+
+  public static BigDecimalExpector expect(final BigDecimal b) {
+    return new BigDecimalExpector(b);
   }
 
   public static EitherExpector expect(final Either<?, ?> e) {

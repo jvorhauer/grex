@@ -43,6 +43,14 @@ final class IntegerExpectorTests {
   }
 
   @Test
+  void toBeGreaterThan() {
+    expect(5).toBeGreaterThan(4);
+    expect(5).not().toBeGreaterThan(5);
+    expect(5).not().toBeGreaterThan(6);
+    expect((Integer) null).not().toBeGreaterThan(0);
+  }
+
+  @Test
   void toBeZero() {
     expect(0).toBeZero();
     expect(1).not().toBeZero();

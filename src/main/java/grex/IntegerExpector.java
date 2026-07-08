@@ -9,6 +9,7 @@ public final class IntegerExpector extends Expector<Integer, IntegerExpector> {
   private static final Predicate<Integer> pNeg = i -> i == null || i >= 0;
 
   private final Predicate<Integer> pEq = i -> i == null || actual == null || i.compareTo(actual) != 0;
+  private final Predicate<Integer> pGreater = i -> i == null || actual == null || actual <= i;
 
 
   public IntegerExpector(final Integer integer) {
@@ -32,6 +33,13 @@ public final class IntegerExpector extends Expector<Integer, IntegerExpector> {
   public IntegerExpector toBe(final int i) {
     if ((inverted ? pEq.negate() : pEq).test(i)) {
       disappoint(inverted ? "not " + i : stringify(i));
+    }
+    return self();
+  }
+
+  public IntegerExpector toBeGreaterThan(final int i) {
+    if ((inverted ? pGreater.negate() : pGreater).test(i)) {
+      disappoint(inverted ? "not greater than " + i : "greater than " + i);
     }
     return self();
   }

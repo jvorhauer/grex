@@ -9,12 +9,12 @@ public final class StringExpector extends CharSeqExpector<String, StringExpector
   private int size;
   private final boolean isBlank;
 
-  private final Predicate<String> pCont = s -> s == null || !actual.contains(s);
-  private final Predicate<String> pContNoCase = s -> s == null || !actual.toLowerCase().contains(s.toLowerCase());
+  private final Predicate<String> pCont = s -> s == null || actual == null || !actual.contains(s);
+  private final Predicate<String> pContNoCase = s -> s == null || actual == null || !actual.toLowerCase().contains(s.toLowerCase());
   private final Predicate<Integer> pLonger = i -> i == null || size <= i;
   private final Predicate<Integer> pLongerOrEqualLength = i -> i == null || size < i;
   private final Predicate<Integer> pLen = i -> i == null || size != i;
-  private final Predicate<String> pEq = s -> s == null || s.compareTo(actual) != 0;
+  private final Predicate<String> pEq = s -> s == null || actual == null || s.compareTo(actual) != 0;
 
   public StringExpector(final String s) {
     super(s);
@@ -45,7 +45,7 @@ public final class StringExpector extends CharSeqExpector<String, StringExpector
   }
 
   public StringExpector toContain(final String sub) {
-    return pCont.test(sub) ? disappoint("string that contains " + sub, sub + " not in " + actual) : self();
+    return invert(pCont).test(sub) ? disappoint("string that contains " + sub, sub + " not in " + actual) : self();
   }
 
   public StringExpector toContainIgnoreCase(final String sub) {

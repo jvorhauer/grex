@@ -8,7 +8,7 @@ public final class IntegerExpector extends Expector<Integer, IntegerExpector> {
   private static final Predicate<Integer> pPos = i -> i == null || i <= 0;
   private static final Predicate<Integer> pNeg = i -> i == null || i >= 0;
 
-  private final Predicate<Integer> pEq = i -> i == null || i.compareTo(actual) != 0;
+  private final Predicate<Integer> pEq = i -> i == null || actual == null || i.compareTo(actual) != 0;
 
 
   public IntegerExpector(final Integer integer) {

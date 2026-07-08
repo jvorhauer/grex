@@ -37,3 +37,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Metals
+.metals/
+.bloop/
+.scala-build/
+metals.sbt
+

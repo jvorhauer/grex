@@ -70,7 +70,6 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits Boole
   }
 
   protected final S disappoint(final String expected, final String actual) {
-    System.out.printf("disappoint: description: %s, expected: %s, actual: %s%n", description, expected, actual);
     throw new Disappointment(description, expected, actual);
   }
 

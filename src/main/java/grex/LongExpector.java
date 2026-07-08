@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 public final class LongExpector extends Expector<Long, LongExpector> {
 
-  private final Predicate<Long> pEq = l -> l == null || actual.compareTo(l) != 0;
+  private final Predicate<Long> pEq = l -> l == null || actual == null || actual.compareTo(l) != 0;
   private final Predicate<Long> pPos = l -> l == null ||  l <= 0L;
   private final Predicate<Long> pNeg = l -> l == null || l >= 0L;
   private final Predicate<Long> pZero = l -> l == null ||  l != 0L;

@@ -15,6 +15,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/juvor/grex</url>
+    </repository>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -31,7 +39,10 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>3.3.1</version>
         <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <useReleaseProfile>false</useReleaseProfile>
           <preparationGoals>clean verify</preparationGoals>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
         </configuration>
       </plugin>
     </plugins>

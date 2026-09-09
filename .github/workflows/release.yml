@@ -1,0 +1,52 @@
+name: Maven Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Run in dry-run mode (no actual release)'
+        required: false
+        default: 'false'
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: false
+        default: ''
+
+jobs:
+  prepare-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Dry run release preparation
+        if: inputs.dry-run == 'true'
+        run: mvn -B release:prepare -DdryRun=true -DautoVersionSubmodules=true
+
+      - name: Prepare and perform release
+        if: inputs.dry-run == 'false' && inputs.version != ''
+        run: |
+          mvn -B release:prepare -DautoVersionSubmodules=true -DreleaseVersion=${{ inputs.version }} -DdevelopmentVersion=1.0.0-SNAPSHOT
+          mvn -B release:perform -DautoVersionSubmodules=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

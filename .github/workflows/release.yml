@@ -11,6 +11,10 @@ on:
         description: 'Release version (e.g., 1.0.0)'
         required: false
         default: ''
+      devversion:
+        description: 'Development version (e.g. 1.0.1-SNAPSHOT)'
+        required: false
+        default: ''
 
 jobs:
   prepare-and-deploy:
@@ -48,7 +52,7 @@ jobs:
       - name: Prepare and perform release
         if: inputs.dry-run == 'false' && inputs.version != ''
         run: |
-          mvn -B release:prepare -DautoVersionSubmodules=true -DreleaseVersion=${{ inputs.version }} -DdevelopmentVersion=1.0.0-SNAPSHOT
+          mvn -B release:prepare -DautoVersionSubmodules=true -DreleaseVersion=${{ inputs.version }} -DdevelopmentVersion=${{ inputs.devversion }}
           mvn -B release:perform -DautoVersionSubmodules=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -15,7 +15,7 @@
 
   <scm>
     <connection>scm:git:https://github.com/juvor/grex.git</connection>
-    <developerConnection>scm:git:https://github.com/juvor/grex.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/juvor/grex</developerConnection>
     <url>https://github.com/juvor/grex</url>
     <tag>v1.0.0</tag>
   </scm>

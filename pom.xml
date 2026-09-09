@@ -16,9 +16,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:https://github.com/juvor/grex.git</connection>
-    <developerConnection>scm:git:https://github.com/juvor/grex.git</developerConnection>
-    <url>https://github.com/juvor/grex</url>
+    <connection>scm:git:${project.scm.url}</connection>
+    <developerConnection>scm:git:${project.scm.url}</developerConnection>
+    <url>git@github.com:jvorhauer/grex.git</url>
     <tag>HEAD</tag>
   </scm>
 

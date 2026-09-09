@@ -2,6 +2,10 @@ package grex.control;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static grex.Expector.expect;
 
 class TryTests {
@@ -63,5 +67,72 @@ class TryTests {
 
   private String thrower(final String s) {
     throw new IllegalArgumentException(s);
+  }
+
+  @Test
+  void toOption() {
+    Try<String> t = Try.of(() -> "Hi there");
+    Option<String> o = t.toOption();
+    expect(o).toBeDefined();
+    expect(o.get()).toBe("Hi there");
+
+    t = Try.of(() -> thrower("Boom"));
+    o = t.toOption();
+    expect(o).toBeEmpty();
+  }
+
+  @Test
+  void map() {
+    Try<String> t = Try.of(() -> "Hello");
+    Try<Integer> mapped = t.map(String::length);
+    expect(mapped.isSuccess()).toBeTrue();
+    expect(mapped.get()).toBe(5);
+
+    t = Try.of(() -> thrower("Boom"));
+    mapped = t.map(String::length);
+    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
+
+    t = Try.of(() -> "Hello");
+    mapped = t.map(s -> thrower("Mapper failed").length());
+    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void flatMap() {
+    Try<String> t = Try.of(() -> "Hello");
+    Try<Integer> mapped = t.flatMap(s -> Try.of(s::length));
+    expect(mapped.isSuccess()).toBeTrue();
+    expect(mapped.get()).toBe(5);
+
+    t = Try.of(() -> thrower("Boom"));
+    mapped = t.flatMap(s -> Try.of(s::length));
+    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
+
+    t = Try.of(() -> "Hello");
+    mapped = t.flatMap(s -> Try.of(() -> thrower("Mapper failed").length()));
+    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void io() {
+    Path path = Paths.get("/tmp/test.tst");
+    Try<Path> t1 = Try.of(() -> Files.createFile(path));
+    expect(t1).not().toBeNull();
+    expect(t1.isSuccess()).toBeTrue();
+
+    Try<Boolean> t2 = Try.of(() -> Files.deleteIfExists(path));
+    expect(t2).not().toBeNull();
+    expect(t2.isSuccess()).toBeTrue();
+    expect(t2.get()).toBeTrue();
+
+    Try<Boolean> t3 = Try.of(() -> Files.createFile(path))
+      .flatMap(p -> Try.of(() -> Files.deleteIfExists(p)));
+    expect(t3).not().toBeNull();
+    expect(t3.isSuccess()).toBeTrue();
+    expect(t3.get()).toBeTrue();
   }
 }

@@ -4,6 +4,10 @@ import grex.control.Either.Left;
 import grex.control.Either.Right;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static grex.Expector.expect;
 import static grex.Expector.fail;
 
@@ -86,5 +90,15 @@ final class EitherTests {
             r -> fail("should not be right (" + r + ")"),
             l -> expect(l).toBe("World")
     );
+  }
+
+  @Test
+  void io() {
+    Path path = Paths.get("/tmp/test");
+    Either<String, Path> r = Either.attempt(() -> Files.createFile(path), e -> "IOException: " + e.getMessage());
+    expect(r).toBeRight();
+    Either<String, Boolean> x = Either.attempt(() -> Files.deleteIfExists(path), e -> "IOException: " + e.getMessage());
+    expect(x).toBeRight();
+    expect(x.getRight()).toBeTrue();
   }
 }

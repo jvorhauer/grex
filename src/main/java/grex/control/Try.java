@@ -3,11 +3,12 @@ package grex.control;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
-public sealed interface Try<T> permits Try.Success, Try.Failure {
+public sealed interface Try<T> extends Monad<T> {
 
-  static <T> Try<T> of(Callable<T> c) {
-    Objects.requireNonNull(c, "The callable is null");
+  static <T> Try<T> of(final Callable<T> c) {
+    Objects.requireNonNull(c);
     try {
       return new Success<>(c.call());
     } catch (final Throwable t) {
@@ -18,11 +19,16 @@ public sealed interface Try<T> permits Try.Success, Try.Failure {
   T get();
   boolean isSuccess();
   default boolean isFailure() { return !isSuccess(); }
-  default boolean isEmpty() { return isSuccess(); }
 
   Throwable getCause();
 
   Either<? extends Throwable, T> toEither();
+  Option<T> toOption();
+
+  <U> Try<U> map(final Function<? super T, ? extends U> mapper);
+
+  @Override
+  <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper);
 
 
   record Success<T>(T value) implements Try<T> {
@@ -42,11 +48,31 @@ public sealed interface Try<T> permits Try.Success, Try.Failure {
       return Either.right(value);
     }
 
+    public Option<T> toOption() { return Option.of(value); }
+
     @Override
     public int hashCode() { return Objects.hashCode(value); }
 
     @Override
-    public String toString() { return "Some(" + value + ")"; }
+    public String toString() { return "Success(" + value + ")"; }
+
+    @Override
+    public <U> Try<U> map(final Function<? super T, ? extends U> mapper) {
+      try {
+        return new Success<>(mapper.apply(value));
+      } catch (final Throwable t) {
+        return new Failure<>(t);
+      }
+    }
+
+    @Override
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper) {
+      try {
+        return (Try<U>) mapper.apply(value);
+      } catch (final Throwable t) {
+        return new Failure<>(t);
+      }
+    }
   }
 
 
@@ -66,6 +92,8 @@ public sealed interface Try<T> permits Try.Success, Try.Failure {
       return Either.left(cause);
     }
 
+    public Option<T> toOption() { return Option.none(); }
+
     public boolean equals(final Object o) {
       return (this == o) || (o instanceof Try.Failure<?>(Throwable oc) && Arrays.deepEquals(cause.getStackTrace(), (oc.getStackTrace())));
     }
@@ -76,8 +104,18 @@ public sealed interface Try<T> permits Try.Success, Try.Failure {
     @Override
     public String toString() { return "Failure(" + cause.getMessage() + ")"; }
 
+    @Override
+    public <U> Try<U> map(final Function<? super T, ? extends U> mapper) {
+      return new Failure<>(cause);
+    }
+
+    @Override
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper) {
+      return new Failure<>(cause);
+    }
+
     @SuppressWarnings("unchecked")
-    private static <T extends Throwable, R> R hurls(Throwable t) throws T {
+    private static <T extends Throwable, R> R hurls(final Throwable t) throws T {
       throw (T) t;
     }
   }

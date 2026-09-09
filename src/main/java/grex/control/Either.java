@@ -1,12 +1,10 @@
 package grex.control;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-public sealed interface Either<L, R> extends Serializable permits Either.Left, Either.Right {
+public sealed interface Either<L, R> extends Monad<R> {
   static <L, R>  Either<L, R> left(final L error) {
     return new Left<>(error);
   }
@@ -20,7 +18,7 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
     return (Either<L, R>) either;
   }
 
-  static <L, R> Either<L, R> attempt(final Supplier<? extends R> supplier, Function<Throwable, ? extends L> errfn) {
+  static <L, R> Either<L, R> attempt(final ThrowingSupplier<? extends R> supplier, Function<Throwable, ? extends L> errfn) {
     try {
       return Either.right(supplier.get());
     } catch (final Throwable t) {
@@ -30,8 +28,10 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
 
   boolean isLeft();
   default boolean isRight() { return !isLeft(); }
+
   L getLeft();
   R getRight();
+
   default R get() {
     return getRight();
   }
@@ -47,7 +47,13 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
 
   Option<?> toOption();
 
+  <U> Either<L, U> map(final Function<? super R, ? extends U> mapper);
+
+  @Override
+  <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper);
+
   record Left<L, R>(L value) implements Either<L, R> {
+
 
     @Override
     public boolean isLeft() {
@@ -74,6 +80,16 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
 
     public Option<L> toOption() {
       return Option.none();
+    }
+
+    @Override
+    public <U> Either<L, U> map(final Function<? super R, ? extends U> mapper) {
+      return new Left<>(value);
+    }
+
+    @Override
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper) {
+      return new Left<>(value);
     }
   }
 
@@ -105,5 +121,20 @@ public sealed interface Either<L, R> extends Serializable permits Either.Left, E
     public Option<R> toOption() {
       return Option.of(value);
     }
+
+    @Override
+    public <U> Either<L, U> map(final Function<? super R, ? extends U> mapper) {
+      return new Right<>(mapper.apply(value));
+    }
+
+    @Override
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper) {
+      return (Either<L, U>) mapper.apply(value);
+    }
+  }
+
+  @FunctionalInterface
+  interface ThrowingSupplier<R> {
+    R get() throws Throwable;
   }
 }

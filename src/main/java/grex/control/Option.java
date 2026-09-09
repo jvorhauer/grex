@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public sealed interface Option<T> permits Option.None, Option.Some {
+public sealed interface Option<T> {
 
   static <T> Option<T> of(final T value) {
     return value == null ? none() : some(value);

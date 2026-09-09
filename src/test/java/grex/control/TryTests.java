@@ -15,8 +15,8 @@ class TryTests {
     Try<String> ts = Try.of(() -> "Hello");
     expect(ts).not().toBeNull();
     expect(ts.get()).toBe("Hello");
-    expect(ts.isSuccess()).toBeTrue();
-    expect(ts.isFailure()).not().toBeTrue();
+    expect(ts.succeeded()).toBeTrue();
+    expect(ts.failed()).not().toBeTrue();
   }
 
   @Test
@@ -24,8 +24,8 @@ class TryTests {
     Try<String> ts = Try.of(() -> thrower("You can't just do that!"));
     expect(ts).not().toBeNull();
     expect(ts).toBeOf(Try.Failure.class);
-    expect(ts.isSuccess()).not().toBeTrue();
-    expect(ts.isFailure()).toBeTrue();
+    expect(ts.succeeded()).not().toBeTrue();
+    expect(ts.failed()).toBeTrue();
     expect(ts.getCause()).toBeOf(IllegalArgumentException.class);
   }
 
@@ -85,17 +85,17 @@ class TryTests {
   void map() {
     Try<String> t = Try.of(() -> "Hello");
     Try<Integer> mapped = t.map(String::length);
-    expect(mapped.isSuccess()).toBeTrue();
+    expect(mapped.succeeded()).toBeTrue();
     expect(mapped.get()).toBe(5);
 
     t = Try.of(() -> thrower("Boom"));
     mapped = t.map(String::length);
-    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.failed()).toBeTrue();
     expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
 
     t = Try.of(() -> "Hello");
     mapped = t.map(s -> thrower("Mapper failed").length());
-    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.failed()).toBeTrue();
     expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
   }
 
@@ -103,17 +103,17 @@ class TryTests {
   void flatMap() {
     Try<String> t = Try.of(() -> "Hello");
     Try<Integer> mapped = t.flatMap(s -> Try.of(s::length));
-    expect(mapped.isSuccess()).toBeTrue();
+    expect(mapped.succeeded()).toBeTrue();
     expect(mapped.get()).toBe(5);
 
     t = Try.of(() -> thrower("Boom"));
     mapped = t.flatMap(s -> Try.of(s::length));
-    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.failed()).toBeTrue();
     expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
 
     t = Try.of(() -> "Hello");
     mapped = t.flatMap(s -> Try.of(() -> thrower("Mapper failed").length()));
-    expect(mapped.isFailure()).toBeTrue();
+    expect(mapped.failed()).toBeTrue();
     expect(mapped.getCause()).toBeOf(IllegalArgumentException.class);
   }
 
@@ -122,17 +122,17 @@ class TryTests {
     Path path = Paths.get("/tmp/test.tst");
     Try<Path> t1 = Try.of(() -> Files.createFile(path));
     expect(t1).not().toBeNull();
-    expect(t1.isSuccess()).toBeTrue();
+    expect(t1.succeeded()).toBeTrue();
 
     Try<Boolean> t2 = Try.of(() -> Files.deleteIfExists(path));
     expect(t2).not().toBeNull();
-    expect(t2.isSuccess()).toBeTrue();
+    expect(t2.succeeded()).toBeTrue();
     expect(t2.get()).toBeTrue();
 
     Try<Boolean> t3 = Try.of(() -> Files.createFile(path))
       .flatMap(p -> Try.of(() -> Files.deleteIfExists(p)));
     expect(t3).not().toBeNull();
-    expect(t3.isSuccess()).toBeTrue();
+    expect(t3.succeeded()).toBeTrue();
     expect(t3.get()).toBeTrue();
   }
 }

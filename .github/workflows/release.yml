@@ -38,6 +38,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global credential.helper "store --file=.git-credentials"
+          echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git-credentials
 
       - name: Dry run release preparation
         if: inputs.dry-run == 'true'

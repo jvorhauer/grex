@@ -2,6 +2,11 @@
 
 A lightweight and simpler derivate of [assertj](https://assertj.github.io/doc/).
 
+## Status
+
+[![CI](https://github.com/jvorhauer/grex/actions/workflows/ci.yml/badge.svg)](https://github.com/jvorhauer/grex/actions/workflows/ci.yml)
+
+
 ## Why?
 
 AssertJ is great, one of the first dependencies I add to any new JVM project.
@@ -23,9 +28,11 @@ Eventually real documentation will be added to this project, but at this time th
 ```xml
 <dependency>
   <groupId>org.vorticoso</groupId>
-  <atifactId>grex</atifactId>
-  <version>${grex.version.latest}</version>
+  <artifactId>grex</artifactId>
+  <version>LATEST_VERSION</version>
 </dependency>
 ```
 
-The latest version can be found in the `releases` part of the GitHub repository.
+Replace `LATEST_VERSION` with the version shown in the badge above, or check the [GitHub Packages repository](https://maven.pkg.github.com/jvorhauer/grex/org/vorticoso/grex) for available versions.
+
+> Unfortunately the GitHub API for packages is badly documents so that automatically retrieving the latest version is not possible. Sigh.

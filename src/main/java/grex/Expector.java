@@ -1,5 +1,6 @@
 package grex;
 
+import grex.collection.List;
 import grex.control.Either;
 import grex.control.Option;
 
@@ -8,7 +9,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDecimalExpector, BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
+public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDecimalExpector, BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector, ListExpector {
   private Class<T> clazz;
   protected String className;
   protected T actual;
@@ -129,5 +130,9 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDe
 
   public static SupplierExpector expect(final Supplier<?> s) {
     return new SupplierExpector(s);
+  }
+
+  public static ListExpector expect(final List<?> l) {
+    return new ListExpector(l);
   }
 }

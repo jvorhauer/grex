@@ -15,7 +15,7 @@ public final class CollectionExpector extends Expector<Collection<?>, Collection
 
   public CollectionExpector toHaveSize(final int expected) {
     return (inverted == (size == expected)) ?
-      disappoint(className + " to " + (inverted ? "not " : "") + " have size " + expected, className + " with size " + expected) :
+      disappoint(className + " to " + (inverted ? "not " : "") + "have size " + expected, className + " with size " + expected) :
       self();
   }
 

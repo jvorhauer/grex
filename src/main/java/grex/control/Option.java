@@ -22,7 +22,7 @@ public sealed interface Option<T>extends Mappable<T> {
 
   @SuppressWarnings("unchecked")
   static <T> None<T> none() {
-    return (None<T>) None.INSTANCE;
+    return (None<T>) None.NONE;
   }
 
   T get();
@@ -51,6 +51,10 @@ public sealed interface Option<T>extends Mappable<T> {
      if (isEmpty()) emptyAction.run(); else action.accept(get());
   }
 
+  default void forEach(final Consumer<T> mapper) {
+    if (isDefined()) mapper.accept(get());
+  }
+
 
   record Some<T>(T value) implements Option<T> {
 
@@ -67,7 +71,7 @@ public sealed interface Option<T>extends Mappable<T> {
 
 
   record None<T>() implements Option<T> {
-    private static final None<?> INSTANCE = new None<>();
+    private static final None<?> NONE = new None<>();
 
     @Override
     public T get() {

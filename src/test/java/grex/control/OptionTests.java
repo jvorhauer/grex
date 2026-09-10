@@ -81,4 +81,10 @@ public class OptionTests {
       () -> noop()
     );
   }
+
+  @Test
+  void forEach() {
+    Option<String> os = Option.some("Test");
+    os.forEach(s -> System.out.println("s: " + s));
+  }
 }

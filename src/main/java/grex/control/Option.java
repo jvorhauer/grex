@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public sealed interface Option<T> {
+public sealed interface Option<T>extends Mappable<T> {
 
   static <T> Option<T> of(final T value) {
     return value == null ? none() : some(value);
@@ -32,6 +32,10 @@ public sealed interface Option<T> {
 
   default <U> Option<U> map(final Function<? super T, ? extends U> mapper) {
     return isEmpty() ? none() : some(mapper.apply(get()));
+  }
+
+  default <U> Option<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
+    return isEmpty() ? none() : (Option<U>) mapper.apply(get());
   }
 
   default T getOrElse(final T other) {

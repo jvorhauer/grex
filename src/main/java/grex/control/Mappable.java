@@ -8,7 +8,7 @@ import java.util.function.Function;
  *
  * @param <T> the type of the value wrapped by this monad
  */
-public interface Monad<T> {
+public interface Mappable<T> {
 
   /**
    * Transforms the value inside this monad using the given mapper function.
@@ -17,7 +17,7 @@ public interface Monad<T> {
    * @param <U> the result type of the mapper function
    * @return a new monad containing the result of applying the mapper
    */
-  <U> Monad<U> map(Function<? super T, ? extends U> mapper);
+  <U> Mappable<U> map(Function<? super T, ? extends U> mapper);
 
   /**
    * Transforms the value inside this monad using the given mapper function,
@@ -27,5 +27,5 @@ public interface Monad<T> {
    * @param <U> the type wrapped by the resulting monad
    * @return the monad returned by the mapper function
    */
-  <U> Monad<U> flatMap(Function<? super T, ? extends Monad<U>> mapper);
+  <U> Mappable<U> flatMap(Function<? super T, ? extends Mappable<U>> mapper);
 }

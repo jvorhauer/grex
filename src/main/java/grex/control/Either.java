@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public sealed interface Either<L, R> extends Monad<R> {
+public sealed interface Either<L, R> extends Mappable<R> {
   static <L, R>  Either<L, R> left(final L error) {
     return new Left<>(error);
   }
@@ -50,10 +50,9 @@ public sealed interface Either<L, R> extends Monad<R> {
   <U> Either<L, U> map(final Function<? super R, ? extends U> mapper);
 
   @Override
-  <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper);
+  <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper);
 
   record Left<L, R>(L value) implements Either<L, R> {
-
 
     @Override
     public boolean isLeft() {
@@ -88,7 +87,7 @@ public sealed interface Either<L, R> extends Monad<R> {
     }
 
     @Override
-    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper) {
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper) {
       return new Left<>(value);
     }
   }
@@ -128,7 +127,7 @@ public sealed interface Either<L, R> extends Monad<R> {
     }
 
     @Override
-    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Monad<U>> mapper) {
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper) {
       return (Either<L, U>) mapper.apply(value);
     }
   }

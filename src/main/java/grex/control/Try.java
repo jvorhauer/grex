@@ -3,7 +3,7 @@ package grex.control;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
-public sealed interface Try<T> extends Monad<T> {
+public sealed interface Try<T> extends Mappable<T> {
 
   static <T> Try<T> of(final Callable<T> c) {
     try {
@@ -26,7 +26,7 @@ public sealed interface Try<T> extends Monad<T> {
   <U> Try<U> map(final Function<? super T, ? extends U> mapper);
 
   @Override
-  <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper);
+  <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper);
 
 
   record Success<T>(T value) implements Try<T> {
@@ -54,7 +54,7 @@ public sealed interface Try<T> extends Monad<T> {
     }
 
     @Override
-    public <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper) {
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
       try {
         return (Try<U>) mapper.apply(value);
       } catch (final Throwable t) {
@@ -88,7 +88,7 @@ public sealed interface Try<T> extends Monad<T> {
     }
 
     @Override
-    public <U> Try<U> flatMap(final Function<? super T, ? extends Monad<U>> mapper) {
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
       return new Failure<>(cause);
     }
 

@@ -1,11 +1,14 @@
 package grex.control;
 
+import grex.Value;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
-public sealed interface Option<T>extends Mappable<T> {
+public sealed interface Option<T> extends Mappable<T>, Value<T> {
 
   static <T> Option<T> of(final T value) {
     return value == null ? none() : some(value);
@@ -25,10 +28,6 @@ public sealed interface Option<T>extends Mappable<T> {
     return (None<T>) None.NONE;
   }
 
-  T get();
-
-  boolean isEmpty();
-  default boolean isDefined() { return !isEmpty(); }
 
   default <U> Option<U> map(final Function<? super T, ? extends U> mapper) {
     return isEmpty() ? none() : some(mapper.apply(get()));
@@ -53,6 +52,10 @@ public sealed interface Option<T>extends Mappable<T> {
 
   default void forEach(final Consumer<T> mapper) {
     if (isDefined()) mapper.accept(get());
+  }
+
+  default Option<T> filter(final Predicate<T> pred) {
+    if (isDefined() && pred.test(get())) return this; else return none();
   }
 
 

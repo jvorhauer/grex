@@ -19,6 +19,8 @@ public final class ListExpector extends Expector<List<?>, ListExpector> {
   }
 
   public ListExpector toBeEmpty() {
-    return (inverted == isEmpty) ? disappoint("List to be empty", actual + ", size: " + size) : self();
+    return (inverted == isEmpty) ?
+      disappoint("List to " + (inverted ? "not ": "") + "be empty", actual + ", size: " + size) :
+      self();
   }
 }

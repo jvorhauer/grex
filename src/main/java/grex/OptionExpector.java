@@ -26,4 +26,11 @@ public final class OptionExpector extends Expector<Option<?>, OptionExpector> {
     }
     return self();
   }
+
+  public OptionExpector toContain(final Object expected) {
+    if (this.actual.isEmpty() || !this.actual.get().equals(expected)) {
+      disappoint("to contain " + expected);
+    }
+    return self();
+  }
 }

@@ -1,54 +1,87 @@
 package grex.collection;
 
-import grex.control.Mappable;
 import grex.control.Option;
+import org.jspecify.annotations.NonNull;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public class List<T> implements Mappable<T> {
-  private static final int GROW_BY = 9;
-  private T[] elements;
-  private int size;
+@SuppressWarnings("unchecked")
+public final class List<T>  implements Iterable<T> {
+  private final T[] elements;
+  private final int size;
+
+  public List() {
+    size = 0;
+    elements = (T[]) new Object[0];
+  }
+
+  @SafeVarargs
+  public List(final @NonNull T... ts) {
+    size = ts.length;
+    elements = Arrays.copyOf(ts, ts.length);
+  }
 
   public static <T> List<T> of() {
     return new List<>();
   }
 
-  @SuppressWarnings("unchecked")
-  public List() {
-    size = 0;
-    elements = (T[]) new Object[GROW_BY];
-  }
-
-  public static <T> List<T> of(final Collection<T> c) {
-    final List<T> l = new List<>();
-    if (c != null) {
-      c.forEach(l::append);
-    }
-    return l;
-  }
-
   @SafeVarargs
-  public static <T> List<T> of(final T... ts) {
-    final List<T> l = new List<>();
-    for (final T t : ts) {
-      l.append(t);
-    }
-    return l;
+  public static <T> List<T> of(final @NonNull T... ts) {
+    Objects.requireNonNull(ts);
+    return new List<>(ts);
   }
 
-  public List<T> append(final T t) {
-    if (size > elements.length) {
-      elements = Arrays.copyOf(elements, size + GROW_BY);
+  public static <T> List<T> of(final java.util.List<T> jl) {
+    Objects.requireNonNull(jl);
+    T[] result = (T[]) new Object[jl.size()];
+    result = jl.toArray(result);
+    return new List<>(result);
+  }
+
+  public List<T> add(final @NonNull List<T> l) {
+    return add(l.elements);
+  }
+
+  @SuppressWarnings("ManualArrayCopy")    // bullshit, proposed alternative does NOT work (System.arraycopy)
+  @SafeVarargs
+  public final List<T> add(final @NonNull T... ts) {
+    final T[] result = Arrays.copyOf(elements, size + ts.length);
+    for (int i = 0; i < ts.length; i++) {
+      result[size + i] = ts[i];
     }
-    if (t != null) {
-      elements[size] = t;
-      size += 1;
+    return new List<>(result);
+  }
+
+  public List<T> insert(final int where, final @NonNull T t) {
+    if (where > size) {
+      return List.of(this.elements).add(t);
+    } else {
+      if (where >= 0) {
+        return slice(0, where).add(t).add(slice(where, size));
+      } else {
+        return List.of(t).add(this);
+      }
     }
-    return this;
+  }
+
+  // swapped params, I always mix them up :-)
+  public List<T> insert(final @NonNull T t, final int where) {
+    return insert(where, t);
+  }
+
+  public List<T> prepend(final @NonNull T t) {
+    return insert(-1, t);
+  }
+
+  public List<T> slice(final int start, final int end) {
+    return start <= Math.min(end, size) ? List.of(Arrays.copyOfRange(this.elements, start, Math.min(end, size))) : this;
   }
 
   public int size() {
@@ -60,7 +93,16 @@ public class List<T> implements Mappable<T> {
   }
 
   public Option<T> get(final int index) {
-    return index < 0 || index > size ? Option.none() : Option.some(elements[index]);
+    return index < 0 || index >= size ? Option.none() : Option.some(elements[index]);
+  }
+
+  public boolean has(final @NonNull T t) {
+    for (int i = 0; i < size; i++) {
+      if (elements[i].equals(t)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean exists(final int index) {
@@ -72,62 +114,90 @@ public class List<T> implements Mappable<T> {
   }
 
   public List<T> tail() {
-    return of(Arrays.copyOfRange(elements, 1, size));
-  }
-
-  public List<T> filter(final Predicate<T> pred) {
-    final List<T> l = new List<>();
-    for (final T element : elements) {
-      if (element != null && pred.test(element)) {
-        l.append(element);
-      }
-    }
-    return l;
+    return size < 2 ? List.of() : of(Arrays.copyOfRange(elements, 1, size));
   }
 
   @Override
-  public <U> List<U> map(final Function<? super T, ? extends U> mapper) {
-    final List<U> l = new List<>();
-    for (final T t : elements) {
-      if (t != null) {
-        l.append(mapper.apply(t));
-      }
-    }
-    return l;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <U> List<U> flatten() {
-    final List<U> result = new List<>();
+  public void forEach(final Consumer<? super T> c) {
     for (int i = 0; i < size; i++) {
-      final Option<?> maybeSublist = get(i);
-      if (maybeSublist.isDefined()) {
-        final Object sublist = maybeSublist.get();
-        if (sublist instanceof List) {
-          final List<U> typedSublist = (List<U>) sublist;
-          for (int j = 0; j < typedSublist.size(); j++) {
-            final Option<U> maybeElement = typedSublist.get(j);
-            if (maybeElement.isDefined()) {
-              result.append(maybeElement.get());
-            }
-          }
-        }
+      c.accept(elements[i]);
+    }
+  }
+
+  public Stream<T> stream() {
+    return Arrays.stream(elements);
+  }
+
+  public List<T> distinct() {
+    return new List<>((T[]) stream().distinct().toArray());
+  }
+
+  public List<T> filter(final @NonNull Predicate<T> pred) {
+    int count = 0;
+    for (int i = 0; i < size; i++) {
+      if (pred.test(elements[i])) {
+        count++;
       }
     }
-    return result;
+    final T[] result = (T[]) new Object[count];
+    for (int i = 0, j = 0; i < size; i++) {
+      if (pred.test(elements[i])) {
+        result[j++] = elements[i];
+      }
+    }
+    return new List<>(result);
+  }
+
+  public <U> List<U> map(final @NonNull Function<? super T, ? extends U> mapper) {
+    final U[] result = (U[]) new Object[size];
+    for (int i = 0; i < size; i++) {
+      result[i] = mapper.apply(elements[i]);
+    }
+    return new List<>(result);
+  }
+
+  public List<T> sort() {
+    final T[] result = Arrays.copyOf(elements, size);
+    Arrays.sort(result);
+    return new List<>(result);
   }
 
   @Override
-  public <U> List<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
-    final List<U> result = new List<>();
-    for (final T t : elements) {
-      if (t != null) {
-        final List<U> list = (List<U>) mapper.apply(t);
-        for (int i = 0; i < list.size; i++) {
-          list.get(i).forEach(result::append);
-        }
-      }
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("List [ ");
+    if (size > 0) {
+      sb.append(head().get());
+      tail().forEach(obj -> sb.append(", ").append(obj));
     }
-    return result;
+    sb.append(" ]");
+    return sb.toString();
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return new Iteratore();
+  }
+
+  private class Iteratore implements Iterator<T> {
+    int cursor = 0;       // index of next element to return
+
+    Iteratore() {}
+
+    @Override
+    public boolean hasNext() { return cursor < size; }
+
+    @Override
+    public T next() {
+      if (cursor > size) {
+        throw new IllegalStateException();
+      }
+      return elements[cursor++];
+    }
+
+    @Override
+    public void remove() {
+      // List is immutable, so niente remove.
+      throw new UnsupportedOperationException();
+    }
   }
 }

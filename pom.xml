@@ -30,6 +30,13 @@
     </repository>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>mavencentral</id>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>org.jspecify</groupId>
@@ -38,9 +45,22 @@
     </dependency>
 
     <dependency>
+      <groupId>com.typesafe</groupId>
+      <artifactId>config</artifactId>
+      <version>1.4.9</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>6.1.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.4.240</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

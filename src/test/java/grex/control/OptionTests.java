@@ -17,6 +17,7 @@ public class OptionTests {
     expect(some).not().toBeNull();
     expect(some.isEmpty()).not().toBeTrue();
     expect(some.get()).toBe(1);
+    expect(some).toBeDefined();
   }
 
   @Test
@@ -24,9 +25,11 @@ public class OptionTests {
     Option.None<Object> none = Option.none();
     expect(none).not().toBeNull();
     expect(none.isEmpty()).toBeTrue();
+    expect(none).toBeEmpty();
 
     Option<Object> nof = Option.of(null);
     expect(nof.isEmpty()).toBeTrue();
+    expect(nof).toBeEmpty();
   }
 
   @Test
@@ -85,6 +88,13 @@ public class OptionTests {
   @Test
   void forEach() {
     Option<String> os = Option.some("Test");
-    os.forEach(s -> System.out.println("s: " + s));
+    os.forEach(s -> expect(s).toBe("Test"));
+  }
+
+  @Test
+  void filter() {
+    Option<String> os = Option.some("Test");
+    expect(os.filter(s -> s.startsWith("Te"))).toBeDefined();
+    expect(os.filter(s -> s.length() == 5)).toBeEmpty();
   }
 }

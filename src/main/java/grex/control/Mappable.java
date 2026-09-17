@@ -27,5 +27,5 @@ public interface Mappable<T> {
    * @param <U> the type wrapped by the resulting monad
    * @return the monad returned by the mapper function
    */
-  <U> Mappable<U> flatMap(Function<? super T, ? extends Mappable<U>> mapper);
+  <U> Mappable<U> flatMap(Function<? super T, ? extends Mappable<? extends U>> mapper);
 }

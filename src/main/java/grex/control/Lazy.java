@@ -8,7 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class Lazy<T> implements Supplier<T>, Value<T> {
+@SuppressWarnings("unchecked")
+public final class Lazy<T> implements Supplier<T>, Value<T>, Mappable<T> {
   private final ReentrantLock lock = new ReentrantLock();
   private transient volatile Supplier<? extends T> supplier;
 
@@ -18,7 +19,6 @@ public final class Lazy<T> implements Supplier<T>, Value<T> {
     this.supplier = supplier;
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> Lazy<T> of(final @NonNull Supplier<? extends T> supplier) {
     Objects.requireNonNull(supplier, "supplier is null");
     if (supplier instanceof Lazy) {
@@ -46,16 +46,21 @@ public final class Lazy<T> implements Supplier<T>, Value<T> {
     return this.value;
   }
 
-  public boolean isEmpty() {
-    return false;
-  }
+  @Override
+  public boolean isEmpty() { return false; }
+  public boolean isEvaluated() { return supplier == null; }
+  @Override
+  public boolean isLazy() { return true; }
 
-  public boolean isEvaluated() {
-    return supplier == null;
-  }
-
+  @Override
   public <U> Lazy<U> map(final @NonNull Function<? super T, ? extends U> mapper) {
     Objects.requireNonNull(mapper, "mapper is null");
     return Lazy.of(() -> mapper.apply(get()));
+  }
+
+  @Override
+  public <U> Lazy<U> flatMap(final @NonNull Function<? super T, ? extends Mappable<? extends U>> mapper) {
+    Objects.requireNonNull(mapper, "mapper is null");
+    return (Lazy<U>) mapper.apply(get());
   }
 }

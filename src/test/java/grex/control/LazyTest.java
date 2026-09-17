@@ -21,18 +21,29 @@ class LazyTest {
     expect(l.isDefined()).toBeTrue();
 
     expect(g).toBe("Hello");
+
+    expect(l.isLazy()).toBeTrue();
   }
 
   @Test
   void map() {
-    final Lazy<Integer> i = Lazy.of(() -> 42);
-    final Lazy<String> s = i.map(String::valueOf);
-    expect(s.isEvaluated()).not().toBeTrue();
-    expect(i.isEvaluated()).not().toBeTrue();
-    expect(s.get()).toBe("42");
+    final Lazy<Integer> li = Lazy.of(() -> 42);
+    final Lazy<String> ls = li.map(String::valueOf);
+    expect(ls.isEvaluated()).not().toBeTrue();
+    expect(li.isEvaluated()).not().toBeTrue();
+    expect(ls.get()).toBe("42");
 
     final Lazy<Logger> logger = Lazy.of(Logger::getAnonymousLogger);
     expect(logger.isEvaluated()).not().toBeTrue();
-    logger.get().info("logger");
+  }
+
+  @Test
+  void flatMap() {
+    final Lazy<Integer> li = Lazy.of(() -> 42);
+    final Lazy<String> ls = li.flatMap(i -> Lazy.of(() -> String.valueOf(i)));
+    expect(ls).not().toBeEvaluated();
+    expect(li).toBeEvaluated();
+    expect(ls.get()).toBe("42");
+    expect(ls).toBeEvaluated();
   }
 }

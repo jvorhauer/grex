@@ -50,7 +50,7 @@ public sealed interface Either<L, R> extends Mappable<R> {
   <U> Either<L, U> map(final Function<? super R, ? extends U> mapper);
 
   @Override
-  <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper);
+  <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<? extends U>> mapper);
 
   record Left<L, R>(L value) implements Either<L, R> {
 
@@ -87,11 +87,12 @@ public sealed interface Either<L, R> extends Mappable<R> {
     }
 
     @Override
-    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper) {
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<? extends U>> mapper) {
       return new Left<>(value);
     }
   }
 
+  @SuppressWarnings("unchecked")
   record Right<L, R>(R value) implements Either<L, R> {
 
     @Override
@@ -127,7 +128,7 @@ public sealed interface Either<L, R> extends Mappable<R> {
     }
 
     @Override
-    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<U>> mapper) {
+    public <U> Either<L, U> flatMap(final Function<? super R, ? extends Mappable<? extends U>> mapper) {
       return (Either<L, U>) mapper.apply(value);
     }
   }

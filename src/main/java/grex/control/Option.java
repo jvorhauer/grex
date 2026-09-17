@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public sealed interface Option<T> extends Mappable<T>, Value<T> {
 
   static <T> Option<T> of(final T value) {
@@ -23,7 +24,6 @@ public sealed interface Option<T> extends Mappable<T>, Value<T> {
     return new Some<>(value);
   }
 
-  @SuppressWarnings("unchecked")
   static <T> None<T> none() {
     return (None<T>) None.NONE;
   }
@@ -33,7 +33,7 @@ public sealed interface Option<T> extends Mappable<T>, Value<T> {
     return isEmpty() ? none() : some(mapper.apply(get()));
   }
 
-  default <U> Option<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
+  default <U> Option<U> flatMap(final Function<? super T, ? extends Mappable<? extends U>> mapper) {
     return isEmpty() ? none() : (Option<U>) mapper.apply(get());
   }
 
@@ -41,7 +41,6 @@ public sealed interface Option<T> extends Mappable<T>, Value<T> {
     return isEmpty() ? other : get();
   }
 
-  @SuppressWarnings("unchecked")
   default Option<T> orElse(final Option<? extends T> other) {
     return isEmpty() ? (Option<T>) other : this;
   }

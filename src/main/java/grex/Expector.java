@@ -2,6 +2,7 @@ package grex;
 
 import grex.collection.List;
 import grex.control.Either;
+import grex.control.Lazy;
 import grex.control.Option;
 
 import java.math.BigDecimal;
@@ -9,7 +10,7 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDecimalExpector, BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector, ListExpector {
+public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDecimalExpector, BooleanExpector, CharSeqExpector, CollectionExpector, EitherExpector, IntegerExpector, LazyExpector, ListExpector, LongExpector, ObjectExpector, OptionExpector, SupplierExpector {
   private Class<T> clazz;
   protected String className;
   protected T actual;
@@ -134,5 +135,9 @@ public abstract sealed class Expector<T, S extends Expector<T, S>> permits BigDe
 
   public static ListExpector expect(final List<?> l) {
     return new ListExpector(l);
+  }
+
+  public static LazyExpector expect(final Lazy<?> l) {
+    return new LazyExpector(l);
   }
 }

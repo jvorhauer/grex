@@ -26,9 +26,10 @@ public sealed interface Try<T> extends Mappable<T> {
   <U> Try<U> map(final Function<? super T, ? extends U> mapper);
 
   @Override
-  <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper);
+  <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<? extends U>> mapper);
 
 
+  @SuppressWarnings("unchecked")
   record Success<T>(T value) implements Try<T> {
 
     @Override
@@ -54,7 +55,7 @@ public sealed interface Try<T> extends Mappable<T> {
     }
 
     @Override
-    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<? extends U>> mapper) {
       try {
         return (Try<U>) mapper.apply(value);
       } catch (final Throwable t) {
@@ -88,7 +89,7 @@ public sealed interface Try<T> extends Mappable<T> {
     }
 
     @Override
-    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<U>> mapper) {
+    public <U> Try<U> flatMap(final Function<? super T, ? extends Mappable<? extends U>> mapper) {
       return new Failure<>(cause);
     }
 

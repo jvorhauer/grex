@@ -3,10 +3,10 @@ package grex.collection;
 import grex.control.Option;
 import org.jspecify.annotations.NonNull;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -156,6 +156,14 @@ public final class List<T>  implements Iterable<T> {
     return new List<>(result);
   }
 
+  public <U> U reduce(final @NonNull U accumulator, final @NonNull BiFunction<U, ? super T, U> reducer) {
+    U result = accumulator;
+    for (int i = 0; i < size; i++) {
+      result = reducer.apply(result, elements[i]);
+    }
+    return result;
+  }
+
   public List<T> sort() {
     final T[] result = Arrays.copyOf(elements, size);
     Arrays.sort(result);
@@ -164,7 +172,7 @@ public final class List<T>  implements Iterable<T> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("List [ ");
+    final StringBuilder sb = new StringBuilder("List[ ");
     if (size > 0) {
       sb.append(head().get());
       tail().forEach(obj -> sb.append(", ").append(obj));
@@ -175,13 +183,13 @@ public final class List<T>  implements Iterable<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new Iteratore();
+    return new ListIterator();
   }
 
-  private class Iteratore implements Iterator<T> {
+  private class ListIterator implements Iterator<T> {
     int cursor = 0;       // index of next element to return
 
-    Iteratore() {}
+    ListIterator() {}
 
     @Override
     public boolean hasNext() { return cursor < size; }

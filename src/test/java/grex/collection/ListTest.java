@@ -60,11 +60,11 @@ class ListTest {
     List<String> l = List.of("first", "second", "third", "another", "and more");
     var slice = l.slice(1, 4);
     expect(slice).toHaveSize(3);
-    expect(slice.toString()).toBe("List [ second, third, another ]");
+    expect(slice.toString()).toBe("List[ second, third, another ]");
 
     slice = l.slice(2, 15);
     expect(slice).toHaveSize(3);
-    expect(slice.toString()).toBe("List [ third, another, and more ]");
+    expect(slice.toString()).toBe("List[ third, another, and more ]");
   }
 
   @Test
@@ -220,8 +220,8 @@ class ListTest {
     List<String> l = List.of("first", "second", "third", "another", "and more");
     List<String> s = l.sort();
     expect(s).toHaveSize(l.size());
-    expect(s.toString()).toBe("List [ and more, another, first, second, third ]");
-    expect(l.toString()).toBe("List [ first, second, third, another, and more ]");
+    expect(s.toString()).toBe("List[ and more, another, first, second, third ]");
+    expect(l.toString()).toBe("List[ first, second, third, another, and more ]");
   }
 
   @Test
@@ -259,5 +259,24 @@ class ListTest {
     List<String> d = l.distinct();
     expect(l).toHaveSize(5);
     expect(d).toHaveSize(4);
+  }
+
+  @Test
+  void reduce() {
+    List<Integer> l = List.of(1, 2, 3, 4, 5);
+    Integer sum = l.reduce(0, Integer::sum);
+    expect(sum).toBe(15);
+
+    List<String> strings = List.of("a", "b", "c");
+    String concat = strings.reduce("", (acc, s) -> acc + s);
+    expect(concat).toBe("abc");
+
+    List<Integer> empty = List.of();
+    Integer emptySum = empty.reduce(42, Integer::sum);
+    expect(emptySum).toBe(42);
+
+    List<Integer> ints = List.of(1, 2, 3);
+    Integer product = ints.reduce(1, (acc, i) -> acc * i);
+    expect(product).toBe(6);
   }
 }

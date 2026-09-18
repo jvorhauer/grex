@@ -10,10 +10,10 @@ class MapTest {
 
   @Test
   void of() {
-    var m = Map.of();
+    final Map<Object, Object> m = Map.of();
     expect(m).not().toBeNull();
-    expect(m.size()).toBe(0);
-    expect(m.isEmpty()).toBeTrue();
+    expect(m).toHaveSize(0);
+    expect(m).toBeEmpty();
   }
 
   @Test
@@ -24,8 +24,8 @@ class MapTest {
       Pair.of("third", 3)
     );
     expect(m).not().toBeNull();
-    expect(m.size()).toBe(3);
-    expect(m.isEmpty()).not().toBeTrue();
+    expect(m).toHaveSize(3);
+    expect(m).not().toBeEmpty();
   }
 
   @Test
@@ -36,19 +36,19 @@ class MapTest {
     jm.put("c", 3);
     final Map<String, Integer> m = Map.of(jm);
     expect(m).not().toBeNull();
-    expect(m.size()).toBe(3);
-    expect(m.has("a")).toBeTrue();
+    expect(m).toHaveSize(3);
+    expect(m).toHave("a");
     expect(m.get("a").get()).toBe(1);
   }
 
   @Test
   void put() {
     final Map<String, Integer> m = Map.of();
-    expect(m.size()).toBe(0);
+    expect(m).toHaveSize(0);
 
     final Map<String, Integer> m1 = m.put("key", 42);
-    expect(m1.size()).toBe(1);
-    expect(m1.has("key")).toBeTrue();
+    expect(m1).toHaveSize(1);
+    expect(m1).toHave("key");
     expect(m1.get("key").get()).toBe(42);
 
     final Map<String, Integer> m2 = m1.put("another", 100);

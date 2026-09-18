@@ -116,12 +116,12 @@ class ListTest {
     expect(l.has("one")).not().toBeTrue();
 
     final List<String> m = List.of("one", "zwei", "drei", "vier");
-    expect(m.has("one")).toBeTrue();
-    expect(m.has("fünf")).not().toBeTrue();
+    expect(m).toHave("one");
+    expect(m).not().toHave("five");
 
-    expect(List.of(1, 2, 3).has(2)).toBeTrue();
-    expect(List.of(true, true, true).has(false)).not().toBeTrue();
-    expect(List.of(2.0f, 3.0f, 66.6f).has(2.0f)).toBeTrue();
+    expect(List.of(1, 2, 3)).toHave(2);
+    expect(List.of(true, true, true)).not().toHave(false);
+    expect(List.of(2.0f, 3.0f, 66.6f)).toHave(2.0f);
   }
 
   @Test
@@ -176,6 +176,7 @@ class ListTest {
     expect(tail.size()).toBe(4);
     expect(tail.head()).toBeDefined();
     expect(tail.head().get()).toBe("second");
+    expect(tail).toHave("another");
   }
 
   @Test

@@ -23,4 +23,11 @@ public final class ListExpector extends Expector<List<?>, ListExpector> {
       disappoint("List to " + (inverted ? "not ": "") + "be empty", actual + ", size: " + size) :
       self();
   }
+
+  @SuppressWarnings("unchecked")
+  public ListExpector toHave(final Object o) {
+    return (inverted == ((List<Object>) actual).has(o)) ?
+      disappoint("List to " + (inverted ? "not " : "") + " have " + o) :
+      self();
+  }
 }
